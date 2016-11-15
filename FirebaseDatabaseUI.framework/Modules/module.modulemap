@@ -1,0 +1,3 @@
+framework module FirebaseDatabaseUI {
+    header "FirebaseDatabaseUI-Swift.h"
+}
