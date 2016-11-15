@@ -13,9 +13,9 @@ Pod::Spec.new do |s|
   s.default_subspecs = 'Database'
 
   s.subspec 'Database' do |database|
-    #database.source_files = "FirebaseDatabaseUI/*.{swift}"
+    database.source_files = "FirebaseDatabaseUI/*.{swift}"
     database.dependency 'Firebase/Database'
-    database.dependency 'SwiftLCS', '~> 1.1.0'
+    database.dependency 'SwiftLCS', '>= 1.1.0'
 
 #database.vendored_frameworks = 'FirebaseDatabaseUI'
 
