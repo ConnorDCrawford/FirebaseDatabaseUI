@@ -17,10 +17,10 @@
 import FirebaseDatabase
 import SwiftLCS
 
-open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
+open class FirebaseArray<T : FirebaseModel>: NSObject, Collection {
     
-    public typealias SortOrderBlock = (Model, Model) -> ComparisonResult
-    public typealias FilterBlock = (Model) -> Bool
+    public typealias SortOrderBlock = (T, T) -> ComparisonResult
+    public typealias FilterBlock = (T) -> Bool
     public typealias Index = Int
     
     /**
@@ -38,16 +38,16 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
      * The block with which the snapshots are filtered. If filterBlock is nil, the array reflects all
      * results from the Firebase Query or Reference.
      */
-    private var filterBlock: FilterBlock?
+    var filterBlock: FilterBlock?
     
     
     /**
      * The block with which the snapshots are sorted. If sortOrderBlock is nil, the array is sorted
      * in the order specified by the Firebase Query or Reference.
      */
-    private var sortOrderBlock: SortOrderBlock?
+    var sortOrderBlock: SortOrderBlock?
     
-    // TODO: Write open convenience initializers and documentation
+    // TODO: Write documentation
     
     public convenience init(ref: FIRDatabaseReference) {
         self.init(query: ref)
@@ -74,9 +74,11 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
     public init(query: FIRDatabaseQuery, sortOrderBlock: SortOrderBlock?, filterBlock: FilterBlock?) {
         self.query = query
         self.filterBlock = filterBlock
-        self.sortOrderBlock = sortOrderBlock
+        self.sortOrderBlock = sortOrderBlock ?? { (t1, t2) in
+            return t1.key < t2.key ? .orderedAscending : .orderedDescending
+        }
         super.init()
-        self.initListeners()
+        self.initListeners(for: query)
     }
     
     deinit {
@@ -85,15 +87,15 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         }
     }
     
-    // MARK: - Private API methods
+    // MARK: - internal API methods
     
-    private var models = [Model]()
-    private lazy var hiddenModels = [String : Model]()
+    var models = [T]()
+    lazy var hiddenModels = [String : T]()
     private var isInitialized = false
-    private lazy var observerHandles = [UInt]()
-    private lazy var keys = Set<String>()
+    lazy var observerHandles = [UInt]()
+    lazy var keys = Set<String>()
     
-    private func initListeners() {
+    func initListeners(for query: FIRDatabaseQuery) {
         
         let cancelHandler: (Error)->Void = { (error: Error) in
             self.delegate?.cancelled(with: error)
@@ -102,7 +104,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         let valueHandler = { (snapshot: FIRDataSnapshot) in
             for childSnap in snapshot.children.allObjects {
                 guard let childSnap = childSnap as? FIRDataSnapshot,
-                    let model = Model(snapshot: childSnap)
+                    let model = T(snapshot: childSnap)
                     else { break }
                 let index = self.insertionIndex(of: model)
                 self.keys.insert(model.key)
@@ -115,12 +117,12 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
                 }
                 
             }
-            self.delegate?.initialized(children: self.models)
+            self.delegate?.initialized()
             self.isInitialized = true
         }
         
         let addHandler = { (snapshot: FIRDataSnapshot) in
-            guard self.isInitialized, let model = Model(snapshot: snapshot) else { return }
+            guard self.isInitialized, let model = T(snapshot: snapshot) else { return }
             
             // Check if result should be filtered
             if let filterBlock = self.filterBlock, !filterBlock(model) {
@@ -148,7 +150,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         
         let changeHandler = { (snapshot: FIRDataSnapshot) in
             let index = self.index(of: snapshot.key)
-            guard let model = Model(snapshot: snapshot) else { return }
+            guard let model = T(snapshot: snapshot) else { return }
             
             if let filterBlock = self.filterBlock {
                 let shouldFilterModel = !filterBlock(model)
@@ -185,7 +187,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         }
         
         let moveHandler = { (snapshot: FIRDataSnapshot) in
-            if let oldIndex = self.index(of: snapshot.key), let model = Model(snapshot: snapshot) {
+            if let oldIndex = self.index(of: snapshot.key), let model = T(snapshot: snapshot) {
                 self.models.remove(at: oldIndex)
                 let newIndex = self.insertionIndex(of: model)
                 self.models.insert(model, at: newIndex)
@@ -199,10 +201,10 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         let removed = query.observe(.childRemoved, with: removeHandler, withCancel: cancelHandler)
         let moved = query.observe(.childMoved, with: moveHandler, withCancel: cancelHandler)
         
-        observerHandles = [added, changed, removed, moved]
+        observerHandles.append(contentsOf: [added, changed, removed, moved])
     }
     
-    func compare(model: Model, with aModel: Model) -> ComparisonResult? {
+    func compare(model: T, with aModel: T) -> ComparisonResult? {
         let m1 = model
         let m2 = aModel
         
@@ -212,7 +214,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         return m1.key.compare(m2.key)
     }
     
-    private func index(of key: String) -> Index? {
+    func index(of key: String) -> Index? {
         return models.index(where: { (snapshot) -> Bool in
             if snapshot.key == key {
                 return true
@@ -221,7 +223,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         })
     }
     
-    private func insertionIndex(of object: Model) -> Index {
+    func insertionIndex(of object: T) -> Index {
         if sortOrderBlock != nil {
             return models.insertionIndex(of: object) { (s1, s2) -> Bool in
                 return compare(model: s1, with: s2) == .orderedAscending
@@ -230,13 +232,11 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         return self.models.count
     }
     
-    // MARK: - open API methods
-    
-    private static func getFilterBlock(from predicate: NSPredicate?) -> FilterBlock? {
+    static func getFilterBlock(from predicate: NSPredicate?) -> FilterBlock? {
         var filterBlock: FilterBlock?
         
         if let predicate = predicate {
-            filterBlock = { (model: Model) -> Bool in
+            filterBlock = { (model: T) -> Bool in
                 return predicate.evaluate(with: model)
             }
         }
@@ -244,54 +244,10 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         return filterBlock
     }
     
-    private func add(hiddenModel: Model) -> Index {
-        hiddenModels.removeValue(forKey: hiddenModel.key)
-        let index = insertionIndex(of: hiddenModel)
-        models.insert(hiddenModel, at: index)
-        keys.insert(hiddenModel.key)
-        return index
-    }
-    
-    open func setFilter(with filterBlock: FilterBlock?) {
-        self.filterBlock = filterBlock
-        
-        delegate?.beginUpdates()
-        if let filterBlock = filterBlock {
-            // Hide visible models that should now be hidden
-            for (index, model) in models.enumerated().reversed() {
-                if !filterBlock(model) {
-                    hiddenModels[model.key] = model
-                    models.remove(at: index)
-                    keys.remove(model.key)
-                    delegate?.removed(child: model, at: index)
-                }
-            }
-            
-        }
-        
-        // Show hidden models that should now be visible
-        let oldModels = models
-        for (_, hidden) in hiddenModels {
-            if filterBlock == nil || filterBlock!(hidden) {
-                _ = add(hiddenModel: hidden)
-            }
-        }
-        let diff = oldModels.diff(models)
-        for index in diff.addedIndexes {
-            delegate?.added(child: models[index], at: index)
-        }
-        
-        delegate?.endUpdates()
-    }
-    
-    open func setFilter(with predicate: NSPredicate?) {
-        setFilter(with: FirebaseArray.getFilterBlock(from: predicate))
-    }
-    
-    private static func getSortOrderBlock(from sortDescriptors: [NSSortDescriptor]?) -> SortOrderBlock? {
+    static func getSortOrderBlock(from sortDescriptors: [NSSortDescriptor]?) -> SortOrderBlock? {
         var sortOrderBlock: SortOrderBlock?
         if let sortDescriptors = sortDescriptors, !sortDescriptors.isEmpty {
-            sortOrderBlock = { (m1: Model, m2: Model) -> ComparisonResult in
+            sortOrderBlock = { (m1: T, m2: T) -> ComparisonResult in
                 if m1.key == m2.key {
                     return .orderedSame
                 }
@@ -310,6 +266,54 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         return sortOrderBlock
     }
     
+    func add(hiddenModel: T) -> Index {
+        hiddenModels.removeValue(forKey: hiddenModel.key)
+        let index = insertionIndex(of: hiddenModel)
+        models.insert(hiddenModel, at: index)
+        keys.insert(hiddenModel.key)
+        return index
+    }
+    
+    // MARK: - open API methods
+    
+    open func setFilter(with filterBlock: FilterBlock?) {
+        self.filterBlock = filterBlock
+        
+        let updateBlock = {
+            if let filterBlock = filterBlock {
+                // Hide visible models that should now be hidden
+                for (index, model) in self.models.enumerated().reversed() {
+                    if !filterBlock(model) {
+                        self.hiddenModels[model.key] = model
+                        self.models.remove(at: index)
+                        self.keys.remove(model.key)
+                        self.delegate?.removed(child: model, at: index)
+                    }
+                }
+                
+            }
+            
+            // Show hidden models that should now be visible
+            let oldModels = self.models
+//            var indices = [Index]()
+            for (_, hidden) in self.hiddenModels {
+                if filterBlock == nil || filterBlock!(hidden) {
+                    _ = self.add(hiddenModel: hidden)
+                }
+            }
+            let diff = oldModels.diff(self.models)
+            for index in diff.addedIndexes {
+                self.delegate?.added(child: self.models[index], at: index)
+            }
+        }
+        
+        delegate?.update(with: updateBlock)
+    }
+    
+    open func setFilter(with predicate: NSPredicate?) {
+        setFilter(with: FirebaseArray.getFilterBlock(from: predicate))
+    }
+    
     open func setSortOrder(with sortOrderBlock: SortOrderBlock?) {
         self.sortOrderBlock = sortOrderBlock
         if let sortOrderBlock = sortOrderBlock {
@@ -321,7 +325,7 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
                 return m1.key.compare(m2.key) == .orderedAscending
             })
         }
-        delegate?.changedSortOrder(of: models)
+        delegate?.changedSortOrder()
     }
     
     open func setSortOrder(with sortDescriptors: [NSSortDescriptor]?) {
@@ -329,20 +333,11 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
     }
     
     /**
-     * Returns an object at a specific index in the FirebaseArray.
-     * @param index The index of the item to retrieve
-     * @return The object at the given index
-     */
-    open func object(at index: Int) -> Model {
-        return models[index]
-    }
-    
-    /**
      * Returns a Firebase reference for an object at a specific index in the FirebaseArray.
      * @param index The index of the item to retrieve a reference for
      * @return A Firebase reference for the object at the given index
      */
-    open func ref(for index: Int) -> FIRDatabaseReference {
+    open func ref(for index: Index) -> FIRDatabaseReference {
         return models[index].ref
     }
     
@@ -361,11 +356,11 @@ open class FirebaseArray<Model : FirebaseModel>: NSObject, Collection {
         return models.count
     }
     
-    open subscript(index: Int) -> Model {
+    open subscript(index: Index) -> T {
         return models[index]
     }
     
-    open subscript(key: String) -> Model? {
+    open subscript(key: String) -> T? {
         if let index = index(of: key) {
             return models[index]
         }

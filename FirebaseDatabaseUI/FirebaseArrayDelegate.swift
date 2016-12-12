@@ -18,28 +18,26 @@ import FirebaseDatabase
 
 public protocol FirebaseArrayDelegate: class {
     
-    func beginUpdates()
-    func endUpdates()
-    func initialized<Model : FirebaseModel>(children: [Model])
-    func added<Model : FirebaseModel>(child: Model, at index: Int)
-    func changed<Model : FirebaseModel>(child: Model, at index: Int)
-    func removed<Model : FirebaseModel>(child: Model, at index: Int)
-    func moved<Model : FirebaseModel>(child: Model, from oldIndex: Int, to newIndex: Int)
-    func changedSortOrder<Model : FirebaseModel>(of children: [Model])
+    func update(with block: (()->Void)?)
+    func initialized()
+    func added<T : FirebaseModel>(child: T, at index: Int)
+    func changed<T : FirebaseModel>(child: T, at index: Int)
+    func removed<T : FirebaseModel>(child: T, at index: Int)
+    func moved<T : FirebaseModel>(child: T, from oldIndex: Int, to newIndex: Int)
+    func changedSortOrder()
     func cancelled(with error: Error)
     
 }
 
 public extension FirebaseArrayDelegate {
     
-    func beginUpdates() {}
-    func endUpdates() {}
-    func initialized<Model : FirebaseModel>(children: [Model]) {}
-    func added<Model : FirebaseModel>(child: Model, at index: Int) {}
-    func changed<Model : FirebaseModel>(child: Model, at index: Int) {}
-    func removed<Model : FirebaseModel>(child: Model, at index: Int) {}
-    func moved<Model : FirebaseModel>(child: Model, from oldIndex: Int, to newIndex: Int) {}
-    func changedSortOrder<Model : FirebaseModel>(of children: [Model]) {}
+    func update(with block: (()->Void)?) {}
+    func initialized() {}
+    func added<T : FirebaseModel>(child: T, at index: Int) {}
+    func changed<T : FirebaseModel>(child: T, at index: Int) {}
+    func removed<T : FirebaseModel>(child: T, at index: Int) {}
+    func moved<T : FirebaseModel>(child: T, from oldIndex: Int, to newIndex: Int) {}
+    func changedSortOrder() {}
     func cancelled(with error: Error) {}
     
 }

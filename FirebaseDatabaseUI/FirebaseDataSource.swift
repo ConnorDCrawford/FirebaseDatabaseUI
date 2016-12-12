@@ -16,12 +16,15 @@
 
 import FirebaseDatabase
 
-open class FirebaseDataSource<Model: FirebaseModel>: NSObject, FirebaseArrayDelegate {
+open class FirebaseDataSource<T: FirebaseModel>: NSObject, FirebaseArrayDelegate {
     
-    open var array: FirebaseArray<Model>
+    open var array: FirebaseArray<T>
     open var cancelBlock: ((Error)->Void)?
     
-    public init(array: FirebaseArray<Model>) {
+    lazy var sections = [String : [T]]()
+    lazy var sectionNames = [String]()
+    
+    public init(array: FirebaseArray<T>) {
         self.array = array
         super.init()
         
@@ -34,7 +37,7 @@ open class FirebaseDataSource<Model: FirebaseModel>: NSObject, FirebaseArrayDele
         return self.array.count
     }
     
-    open func object(at indexPath: IndexPath) -> Model? {
+    open func object(at indexPath: IndexPath) -> T? {
         if indexPath.row < self.array.count {
             return self.array[indexPath.row]
         }
@@ -54,14 +57,13 @@ open class FirebaseDataSource<Model: FirebaseModel>: NSObject, FirebaseArrayDele
     
     // MARK: - FirebaseArrayDelegate methods
     
-    open func beginUpdates() {}
-    open func endUpdates() {}
-    open func initialized<Model : FirebaseModel>(children: [Model]) {}
+    open func update(with block: (() -> Void)?) {}
+    open func initialized() {}
     open func added<Model : FirebaseModel>(child: Model, at index: Int) {}
     open func changed<Model : FirebaseModel>(child: Model, at index: Int) {}
     open func removed<Model : FirebaseModel>(child: Model, at index: Int) {}
     open func moved<Model : FirebaseModel>(child: Model, from oldIndex: Int, to newIndex: Int) {}
-    open func changedSortOrder<Model : FirebaseModel>(of children: [Model]) {}
+    open func changedSortOrder() {}
     
     open func cancelled(with error: Error) {
         cancelBlock?(error)
