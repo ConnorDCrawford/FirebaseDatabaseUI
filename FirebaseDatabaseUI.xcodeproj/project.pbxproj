@@ -17,6 +17,7 @@
 		7D2F85581DC92C7E00796A0C /* FirebaseTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2F85511DC92C7E00796A0C /* FirebaseTableViewDataSource.swift */; };
 		7D2F85591DC92C7E00796A0C /* SnapshotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2F85521DC92C7E00796A0C /* SnapshotModel.swift */; };
 		7D3E18B21DFEF6B2009945D3 /* PaginatedFirebaseCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3E18B11DFEF6B2009945D3 /* PaginatedFirebaseCollectionViewDataSource.swift */; };
+		7D3E18BA1DFEFCB4009945D3 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7D3E18B91DFEFCB4009945D3 /* Info.plist */; };
 		7D63EE1B1DF1CAB1002F370B /* FirebaseCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D63EE181DF1CAB1002F370B /* FirebaseCollectionViewDataSource.swift */; };
 		7D63EE1C1DF1CAB1002F370B /* PaginatedFirebaseArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D63EE191DF1CAB1002F370B /* PaginatedFirebaseArray.swift */; };
 		7D63EE1D1DF1CAB1002F370B /* PaginatedFirebaseTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D63EE1A1DF1CAB1002F370B /* PaginatedFirebaseTableViewDataSource.swift */; };
@@ -41,7 +42,6 @@
 		4806B7FF1CB111273725C346 /* Pods_FirebaseDatabaseUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FirebaseDatabaseUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7817D39F6216FD2D39F02235 /* Pods-FirebaseDatabaseUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FirebaseDatabaseUI.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FirebaseDatabaseUI/Pods-FirebaseDatabaseUI.debug.xcconfig"; sourceTree = "<group>"; };
 		7D2F85321DC92C4C00796A0C /* FirebaseDatabaseUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FirebaseDatabaseUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D2F85361DC92C4C00796A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D2F853B1DC92C4C00796A0C /* FirebaseDatabaseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FirebaseDatabaseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D2F85401DC92C4C00796A0C /* FirebaseDatabaseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseDatabaseUITests.swift; sourceTree = "<group>"; };
 		7D2F85421DC92C4C00796A0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -53,6 +53,7 @@
 		7D2F85511DC92C7E00796A0C /* FirebaseTableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseTableViewDataSource.swift; sourceTree = "<group>"; };
 		7D2F85521DC92C7E00796A0C /* SnapshotModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotModel.swift; sourceTree = "<group>"; };
 		7D3E18B11DFEF6B2009945D3 /* PaginatedFirebaseCollectionViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaginatedFirebaseCollectionViewDataSource.swift; sourceTree = "<group>"; };
+		7D3E18B91DFEFCB4009945D3 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D63EE181DF1CAB1002F370B /* FirebaseCollectionViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseCollectionViewDataSource.swift; sourceTree = "<group>"; };
 		7D63EE191DF1CAB1002F370B /* PaginatedFirebaseArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaginatedFirebaseArray.swift; sourceTree = "<group>"; };
 		7D63EE1A1DF1CAB1002F370B /* PaginatedFirebaseTableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaginatedFirebaseTableViewDataSource.swift; sourceTree = "<group>"; };
@@ -103,6 +104,7 @@
 		7D2F85281DC92C4C00796A0C = {
 			isa = PBXGroup;
 			children = (
+				7D3E18B91DFEFCB4009945D3 /* Info.plist */,
 				7D2F85341DC92C4C00796A0C /* FirebaseDatabaseUI */,
 				7D2F853F1DC92C4C00796A0C /* FirebaseDatabaseUITests */,
 				7D2F85331DC92C4C00796A0C /* Products */,
@@ -134,7 +136,6 @@
 				7D2F85501DC92C7E00796A0C /* FirebaseModel.swift */,
 				7D2F85511DC92C7E00796A0C /* FirebaseTableViewDataSource.swift */,
 				7D2F85521DC92C7E00796A0C /* SnapshotModel.swift */,
-				7D2F85361DC92C4C00796A0C /* Info.plist */,
 			);
 			path = FirebaseDatabaseUI;
 			sourceTree = "<group>";
@@ -248,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D3E18BA1DFEFCB4009945D3 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
