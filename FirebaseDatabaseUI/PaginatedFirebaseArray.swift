@@ -113,6 +113,7 @@ class PaginatedFirebaseArray<T : FirebaseModel>: FirebaseArray<T> {
     
     override func initListeners(for query: FIRDatabaseQuery) {
         var query = query
+        let pageNumber = self.numberOfPages
         
         // Do not init listeners for orignal query
         if query == self.query {
@@ -168,18 +169,19 @@ class PaginatedFirebaseArray<T : FirebaseModel>: FirebaseArray<T> {
         }
         
         let addHandler = { (snapshot: FIRDataSnapshot) in
-            guard self.numberOfPages < self.pageEndValues.count, let model = T(snapshot: snapshot) else { return }
+            guard pageNumber <= self.pageEndValues.count, let object = T(snapshot: snapshot) else { return }
             
             // Check if result should be filtered
-            if let filterBlock = self.filterBlock, !filterBlock(model) {
-                self.hiddenModels[model.key] = model
+            if let filterBlock = self.filterBlock, !filterBlock(object) {
+                self.hiddenModels[object.key] = object
                 return
             }
             
-            if !self.keys.contains(model.key) {
-                let index = self.insertionIndex(of: model)
-                self.models.insert(model, at: index)
-                self.delegate?.added(child: model, at: index)
+            if !self.keys.contains(object.key) {
+                self.keys.insert(object.key)
+                let index = self.insertionIndex(of: object)
+                self.models.insert(object, at: index)
+                self.delegate?.added(child: object, at: index)
             }
             
         }
