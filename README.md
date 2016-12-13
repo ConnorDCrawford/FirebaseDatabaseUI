@@ -2,6 +2,8 @@
 
 FirebaseDatabaseUI is an open-source library for iOS that allows you to quickly connect common UI elements to the [Firebase](https://firebase.google.com?utm_source=FirebaseUI-iOS) database for data storage, allowing views to be updated in realtime as they change, and providing simple interfaces for common tasks like displaying lists or collections of items.
 
+FirebaseDatabaseUI is derived from Google's FirebaseUI, with the following additions: sectioning, sorting, filtering, pagination, support for generic model classes, performance improvements, and more.
+
 ## Installing FirebaseDatabaseUI for iOS
 
 FirebaseDatabaseUI supports iOS 8.0+. To install, [download](https://github.com/ConnorDCrawford/FirebaseDatabaseUI/archive/master.zip) or clone this repository, and then drag and drop the files contained in /FirebaseDatabaseUI into your Xcode project, selecting "Copy items if needed." You will also need to install FirebaseDatabase and SwiftLCS. We recommend using [CocoaPods](https://cocoapods.org/pods/FirebaseUI) to do this. You can do this by adding the following to your `Podfile`:
