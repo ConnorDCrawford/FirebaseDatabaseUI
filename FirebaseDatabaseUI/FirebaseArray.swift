@@ -173,8 +173,8 @@ open class FirebaseArray<T : FirebaseModel>: NSObject, Collection {
             }
             
             if let index = index {
-                let insertionIndex = self.sortOrderBlock == nil ? index : self.insertionIndex(of: model)
                 self.models.remove(at: index)
+                let insertionIndex = self.sortOrderBlock == nil ? index : self.insertionIndex(of: model)
                 self.models.insert(model, at: insertionIndex)
                 self.delegate?.changed(child: model, at: index)
                 
