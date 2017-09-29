@@ -19,7 +19,7 @@ import FirebaseDatabase
 public protocol FirebaseArrayDelegate: class {
     
     func update(with block: (()->Void)?)
-    func initialized()
+    func initialized<T>(array: FirebaseArray<T>)
     func added<T : FirebaseModel>(child: T, at index: Int)
     func changed<T : FirebaseModel>(child: T, at index: Int)
     func removed<T : FirebaseModel>(child: T, at index: Int)
@@ -32,7 +32,7 @@ public protocol FirebaseArrayDelegate: class {
 public extension FirebaseArrayDelegate {
     
     func update(with block: (()->Void)?) {}
-    func initialized() {}
+    func initialized<T>(array: FirebaseArray<T>) {}
     func added<T : FirebaseModel>(child: T, at index: Int) {}
     func changed<T : FirebaseModel>(child: T, at index: Int) {}
     func removed<T : FirebaseModel>(child: T, at index: Int) {}
@@ -41,3 +41,4 @@ public extension FirebaseArrayDelegate {
     func cancelled(with error: Error) {}
     
 }
+

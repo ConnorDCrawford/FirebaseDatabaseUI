@@ -20,15 +20,19 @@ open class FirebaseDataSource<T: FirebaseModel>: NSObject, FirebaseArrayDelegate
     
     open var array: FirebaseArray<T>
     open var cancelBlock: ((Error)->Void)?
+    open var delegate: FirebaseArrayDelegate?
     
     lazy var sections = [String : [T]]()
     lazy var sectionNames = [String]()
     
     public init(array: FirebaseArray<T>) {
         self.array = array
+        
         super.init()
         
+        self.delegate = array.delegate
         self.array.delegate = self
+        
     }
     
     // MARK: - API methods
@@ -44,7 +48,7 @@ open class FirebaseDataSource<T: FirebaseModel>: NSObject, FirebaseArrayDelegate
         return nil
     }
     
-    open func ref(for indexPath: IndexPath) -> FIRDatabaseReference? {
+    open func ref(for indexPath: IndexPath) -> DatabaseReference? {
         if indexPath.row < self.array.count {
             return self.array.ref(for: indexPath.row)
         }
@@ -58,7 +62,7 @@ open class FirebaseDataSource<T: FirebaseModel>: NSObject, FirebaseArrayDelegate
     // MARK: - FirebaseArrayDelegate methods
     
     open func update(with block: (() -> Void)?) {}
-    open func initialized() {}
+    open func initialized<Model>(array: FirebaseArray<Model>) {}
     open func added<Model : FirebaseModel>(child: Model, at index: Int) {}
     open func changed<Model : FirebaseModel>(child: Model, at index: Int) {}
     open func removed<Model : FirebaseModel>(child: Model, at index: Int) {}
